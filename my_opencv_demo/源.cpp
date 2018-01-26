@@ -6,7 +6,7 @@ void showpic(char * pic)
 	cvShowImage("mypic", img);
 	cvWaitKey(0);
 	cvReleaseImage(&img);
-//	cvDestroyWindow("example");
+//	cvDestroyWindow("example"); ²»ÐèÒª
 }
 int main()
 {
