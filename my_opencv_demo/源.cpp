@@ -105,6 +105,47 @@ void ROI()//fail
 	cvReleaseImage(&image);
 	cvDestroyAllWindows();
 }
+void CVNOT()
+{
+	#define NEW_IMG_WIDTH  20
+	#define NEW_IMG_WIDTH 300
+	IplImage *lena = cvLoadImage("D:\\lena.png");
+	IplImage *image1 = cvCreateImage(cvSize(NEW_IMG_WIDTH, NEW_IMG_WIDTH), lena->depth, lena->nChannels);
+	IplImage *image2 = cvCreateImage(cvSize(NEW_IMG_WIDTH, NEW_IMG_WIDTH), lena->depth, lena->nChannels);
+	image1->imageData = (char*)cvPtr2D(lena, 5,10 );
+	image2->imageData = (char*)cvPtr2D(lena, 50,60 );
+	cvNot(image1, image1);
+	cvNot(image2, image2);
+	cvShowImage("lena",lena);
+	cvWaitKey();
+	cvReleaseImage(&lena);
+}
+void split()
+{
+	IplImage *lena = cvLoadImage("D:\\lena.png");
+	IplImage *image1 = cvCreateImage(cvGetSize(lena), lena->depth, 1);
+	IplImage *image2= cvCreateImage(cvGetSize(lena),lena->depth, 1);
+	IplImage *image3 = cvCreateImage(cvGetSize(lena), lena->depth, 1);
+	cvSplit(lena, image1, image2, image3,NULL);//blue,green,red
+	cvShowImage("raw", lena);
+	cvShowImage("blue", image1);
+	cvShowImage("green",image2);
+	cvShowImage("red", image3);
+	IplImage *clone1 = cvCloneImage(image2);
+	IplImage *clone2 = cvCloneImage(image2);
+	double min, max;
+	cvMinMaxLoc(image2, &min, &max);
+	char thresh = (unsigned char)(max - min)/2;
+	cvSet(clone1, cvScalarAll(thresh));
+	cvShowImage("clone1", clone1);
+	cvSet(clone2, cvScalarAll(0), 0);
+	cvShowImage("clone2", clone2);
+	cvCmp(image2, clone1, clone2, CV_CMP_GE);
+	cvShowImage("clone2", clone2);
+	cvSubS(image2, thresh / 2, image2, clone2);
+	cvShowImage("clone2", clone2);
+	cvWaitKey();
+}
 int main()
 {
 	//showpic("D:\\1.jpg");
@@ -112,6 +153,8 @@ int main()
 	//cal_example();
 	//draw_circle();
 	//draw_rec();
-	ROI();
+	//ROI();
+	//CVNOT();
+	split();
 	return 0;
 }
