@@ -52,11 +52,32 @@ void draw_circle()
 	cvWaitKey(0);
 	cvReleaseMat(&mat);
 }
+void draw_rec()
+{
+	CvPoint point1= cvPoint(200, 50);
+	CvPoint point2 = cvPoint(400, 200);
+	int row = 1000, col= 1000;
+	CvMat * mat = cvCreateMat(row, col, CV_8UC3);
+	cvZero(mat);
+	uchar* p;
+	for (int i = 0; i < 1000; i++)
+		for (int j = 0; j < 1000; j++)
+			if (i > point1.x&&i<point2.x&&j>point1.y&&j < point2.y)
+			{
+				p= cvPtr2D(mat, i, j);
+				p++;
+				*p = 255;
+			}
+	cvShowImage("rectangle", mat);
+	cvWaitKey(0);
+	cvReleaseMat(&mat);
+}
 int main()
 {
 	//showpic("D:\\1.jpg");
 	//aviplayer("D:\\1.avi");
 	//cal_example();
-	draw_circle();
+	//draw_circle();
+	draw_rec();
 	return 0;
 }
