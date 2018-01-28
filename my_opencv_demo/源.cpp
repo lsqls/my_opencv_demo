@@ -41,10 +41,22 @@ void cal_example()//ตฺศýียมทฯฐฬโ1
 	cout <<"Three point\t" <<'('<<point.x << ',' << point.y <<')'<< ' ' << '(' << point1.x << ',' << point1.y<< ')' <<
 		' ' << '(' << point2.x <<  ',' << point2.y<<')';
 }
+void draw_circle()
+{
+	CvMat* mat=cvCreateMat(1000, 1000, CV_8UC3);
+	for (int i = 0; i < 1000; i++)
+		for (int j = 0; j < 1000; j++)
+			cvSet2D(mat, i, j, cvScalarAll(0));
+	cvCircle(mat, cvPoint(500, 250), 250, cvScalar(255, 255, 0));
+	cvShowImage("circle", mat);
+	cvWaitKey(0);
+	cvReleaseMat(&mat);
+}
 int main()
 {
 	//showpic("D:\\1.jpg");
 	//aviplayer("D:\\1.avi");
-	cal_example();
+	//cal_example();
+	draw_circle();
 	return 0;
 }
