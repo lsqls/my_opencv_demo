@@ -72,12 +72,46 @@ void draw_rec()
 	cvWaitKey(0);
 	cvReleaseMat(&mat);
 }
+void ROI()//fail
+{
+	// 图像高宽  
+#define IMG_SIZE   420  
+
+	// 边界宽度  
+#define BORDER_WIDTH 10  
+
+	IplImage * image = cvCreateImage(cvSize(IMG_SIZE, IMG_SIZE), 8, 1);
+
+	// 初始化置零  
+	cvZero(image);
+
+	// 灰度值  
+	int value = 0;
+	// ROI区域大小  
+	int rect_size = IMG_SIZE;
+	for (int length = IMG_SIZE; length >= 0 && value <= 200; length -= BORDER_WIDTH, value += 10)
+	{
+		cvSetImageROI(image, cvRect(IMG_SIZE - length, IMG_SIZE - length, rect_size, rect_size));
+
+		rect_size -= 2 * BORDER_WIDTH;
+		cvSet(image, cvScalarAll(value));
+		cvResetImageROI(image);
+	}
+
+	cvNamedWindow("img", 1);
+	cvShowImage("img", image);
+
+	cvWaitKey(0);
+	cvReleaseImage(&image);
+	cvDestroyAllWindows();
+}
 int main()
 {
 	//showpic("D:\\1.jpg");
 	//aviplayer("D:\\1.avi");
 	//cal_example();
 	//draw_circle();
-	draw_rec();
+	//draw_rec();
+	ROI();
 	return 0;
 }
