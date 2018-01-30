@@ -108,10 +108,10 @@ void ROI()//fail
 void CVNOT()
 {
 	#define NEW_IMG_WIDTH  20
-	#define NEW_IMG_WIDTH 300
+	#define NEW_IMG_HEIGHT 300
 	IplImage *lena = cvLoadImage("D:\\lena.png");
-	IplImage *image1 = cvCreateImage(cvSize(NEW_IMG_WIDTH, NEW_IMG_WIDTH), lena->depth, lena->nChannels);
-	IplImage *image2 = cvCreateImage(cvSize(NEW_IMG_WIDTH, NEW_IMG_WIDTH), lena->depth, lena->nChannels);
+	IplImage *image1 = cvCreateImage(cvSize(NEW_IMG_WIDTH, NEW_IMG_HEIGHT), lena->depth, lena->nChannels);
+	IplImage *image2 = cvCreateImage(cvSize(NEW_IMG_WIDTH, NEW_IMG_HEIGHT), lena->depth, lena->nChannels);
 	image1->imageData = (char*)cvPtr2D(lena, 5,10 );
 	image2->imageData = (char*)cvPtr2D(lena, 50,60 );
 	cvNot(image1, image1);
@@ -148,22 +148,77 @@ void split()
 }
 void cap()
 {
-	CvCapture* capture = cvCreateFileCapture("D:\\opencv_demo_file\\1.avi");
-	IplImage *frame, *gray_frame, *canny_frame;
-	
-	while (true)
+	char * file_path = "D:\\opencv_demo_file\\1.avi";
+	CvCapture * capture = 0;
+	capture = cvCreateFileCapture(file_path);
+
+	// 载入视频文件失败  
+	if (capture == NULL)
+		cout<<"Can't load the video file, quit...\n";
+		
+
+
+	// 每一帧  
+	IplImage * frame = cvQueryFrame(capture);;
+	// 灰度后的每一帧  
+	IplImage * gray_frame = cvCreateImage(cvGetSize(frame), frame->depth, 1);
+	IplImage * gray_frame_3 = cvCreateImage(cvGetSize(frame), frame->depth, 3);
+	// 边缘检测后的每一帧  
+	IplImage * canny_frame = cvCreateImage(cvGetSize(frame), frame->depth, 1);
+	IplImage * canny_frame_3 = cvCreateImage(cvGetSize(frame), frame->depth, 3);
+	// 聚合来的每一帧  
+	IplImage * total_frame = cvCreateImage(cvSize(frame->width * 3, frame->height),
+		frame->depth, frame->nChannels);
+
+	while (1)
 	{
+		// 从视频文件读入数据  
 		frame = cvQueryFrame(capture);
-		gray_frame = cvCreateImage(cvGetSize(frame), frame->depth, 1);
-		canny_frame = cvCreateImage(cvGetSize(frame), frame->depth, 1);
+		if (!frame)
+			break;
+
+		// 将读入数据转换为灰度图  
 		cvCvtColor(frame, gray_frame, CV_RGB2GRAY);
+		cvCvtColor(gray_frame, gray_frame_3, CV_GRAY2BGR);
+
+		// 对图像做Canny边缘检测  
 		cvCanny(gray_frame, canny_frame, 30, 100, 3);
-		cvShowImage("frame", frame);
-		cvShowImage("gray_frame", gray_frame);
-		cvShowImage("canny_frame", canny_frame);
-		if (cvWaitKey(30) == 27)
+		cvCvtColor(canny_frame, canny_frame_3, CV_GRAY2BGR);
+
+		// 将三幅图像分别复制到新的图像中  
+		cvSetImageROI(total_frame, cvRect(0, 0, frame->width, frame->height));
+		cvCopy(frame, total_frame, 0);
+		cvResetImageROI(total_frame);
+
+		cvSetImageROI(total_frame, cvRect(frame->width, 0, gray_frame->width, gray_frame->height));
+		cvCopy(gray_frame_3, total_frame, 0);
+		cvResetImageROI(total_frame);
+
+		cvSetImageROI(total_frame, cvRect(frame->width * 2, 0, canny_frame->width, canny_frame->height));
+		cvCopy(canny_frame_3, total_frame, 0);
+		cvResetImageROI(total_frame);
+
+		// 在图像的三个不同的部分写上合适的文字标签  
+		CvFont textFont = cvFont(10, 1);
+		cvInitFont(&textFont, CV_FONT_HERSHEY_SIMPLEX, 0.5f, 0.5f, 0, 1);
+
+		cvPutText(total_frame, "Frame", cvPoint(10, 20), &textFont, cvScalar(0, 0, 255));
+		cvPutText(total_frame, "Frame_Gray", cvPoint(frame->width + 10, 20), &textFont, cvScalar(0, 0, 255));
+		cvPutText(total_frame, "Frame_Canny", cvPoint(frame->width * 2 + 10, 20), &textFont, cvScalar(0, 0, 255));
+
+
+
+		// 显示图像  
+		cvShowImage("total", total_frame);
+
+		char c = cvWaitKey(33);
+		if (c == 27)
 			break;
 	}
+	cvReleaseImage(&gray_frame);
+	cvReleaseCapture(&capture);
+	cvDestroyAllWindows();
+
 }
 int main()
 {
