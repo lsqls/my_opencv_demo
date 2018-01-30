@@ -146,6 +146,25 @@ void split()
 	cvShowImage("clone2", clone2);
 	cvWaitKey();
 }
+void cap()
+{
+	CvCapture* capture = cvCreateFileCapture("D:\\opencv_demo_file\\1.avi");
+	IplImage *frame, *gray_frame, *canny_frame;
+	
+	while (true)
+	{
+		frame = cvQueryFrame(capture);
+		gray_frame = cvCreateImage(cvGetSize(frame), frame->depth, 1);
+		canny_frame = cvCreateImage(cvGetSize(frame), frame->depth, 1);
+		cvCvtColor(frame, gray_frame, CV_RGB2GRAY);
+		cvCanny(gray_frame, canny_frame, 30, 100, 3);
+		cvShowImage("frame", frame);
+		cvShowImage("gray_frame", gray_frame);
+		cvShowImage("canny_frame", canny_frame);
+		if (cvWaitKey(30) == 27)
+			break;
+	}
+}
 int main()
 {
 	//showpic("D:\\1.jpg");
@@ -155,6 +174,7 @@ int main()
 	//draw_rec();
 	//ROI();
 	//CVNOT();
-	split();
+	//split();
+	cap();
 	return 0;
 }
